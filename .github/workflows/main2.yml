@@ -19,10 +19,15 @@ jobs:
       - name: 3. Install Dependencies
         run: |
           pip install --upgrade pip
-          # 安装PyTorch, Diffusers和其他必要的库
-          # PyTorch for macOS (MPS)
+          # 安装 PyTorch, Transformers 等核心依赖
           pip install torch torchvision
-          pip install diffusers transformers accelerate safetensors
+          pip install transformers accelerate safetensors
+
+          # --- 这是关键的修改 ---
+          # 从 GitHub 安装最新版的 diffusers 以获取 ZImagePipeline
+          echo "Installing the latest version of diffusers from GitHub..."
+          pip install git+https://github.com/huggingface/diffusers.git
+          # ---------------------
 
       - name: 4. Run Generation Script
         run: |
@@ -32,4 +37,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-image-diffusers
-          path: generated_image.png # 我们只上传单个图片文件
+          path: generated_image.png

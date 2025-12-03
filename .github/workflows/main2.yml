@@ -20,13 +20,13 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install torch torchvision
-          pip install transformers accelerate safetensors
-          # 确保 diffusers 是最新的
+          # --- 这是关键的修改 ---
+          # 添加 huggingface_hub 用于下载模型
+          pip install transformers accelerate safetensors huggingface_hub
+          # ---------------------
           pip install git+https://github.com/huggingface/diffusers.git
 
       - name: 4. Run Generation Script
-        # 我们让 diffusers 自动处理下载和缓存
-        # 这样更干净，并且能利用 Hugging Face Hub 的优化
         run: |
           python generate.py
 

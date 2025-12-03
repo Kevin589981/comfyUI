@@ -1,4 +1,4 @@
-name: Diffusers Image Generation (Z-Image)
+name: Diffusers Image Generation (Z-Image FP8)
 
 on:
   workflow_dispatch:
@@ -19,22 +19,19 @@ jobs:
       - name: 3. Install Dependencies
         run: |
           pip install --upgrade pip
-          # 安装 PyTorch, Transformers 等核心依赖
           pip install torch torchvision
           pip install transformers accelerate safetensors
-
-          # --- 这是关键的修改 ---
-          # 从 GitHub 安装最新版的 diffusers 以获取 ZImagePipeline
-          echo "Installing the latest version of diffusers from GitHub..."
+          # 确保 diffusers 是最新的
           pip install git+https://github.com/huggingface/diffusers.git
-          # ---------------------
 
       - name: 4. Run Generation Script
+        # 我们让 diffusers 自动处理下载和缓存
+        # 这样更干净，并且能利用 Hugging Face Hub 的优化
         run: |
           python generate.py
 
       - name: 5. Upload Generated Image
         uses: actions/upload-artifact@v4
         with:
-          name: generated-image-diffusers
+          name: generated-image-z-fp8
           path: generated_image.png

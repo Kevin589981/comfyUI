@@ -4,22 +4,26 @@ from diffusers import ZImagePipeline
 
 def main():
     # 1. 设置设备
-    # 在GitHub Actions的macOS runner上，我们使用 'mps'
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"Using device: {device}")
 
     # 2. 加载模型
-    # 使用 bfloat16 以获得最佳性能
-    # low_cpu_mem_usage=False 在有足够RAM时可以加快加载速度
     print("Loading Z-Image-Turbo pipeline...")
     pipe = ZImagePipeline.from_pretrained(
         "Tongyi-MAI/Z-Image-Turbo",
-        torch_dtype=torch.bfloat16,
+        # 使用新的 'dtype' 参数，替换已弃用的 'torch_dtype'
+        dtype=torch.bfloat16,
         low_cpu_mem_usage=False,
     )
-    pipe.to(device)
-    print("Pipeline loaded successfully.")
+    print("Pipeline loaded from pretrained.")
 
+    # --- 这是关键的解决方案 ---
+    # 启用模型CPU卸载以在内存受限的环境中运行
+    print("Enabling model CPU offload to save memory...")
+    pipe.enable_model_cpu_offload()
+    # -------------------------
+    # 注意：在启用卸载后，不需要再手动调用 pipe.to(device)
+    
     # 3. 定义提示词
     prompt = "masterpiece, best quality, a futuristic cybernetic city skyline at dusk, neon lights reflecting on wet streets, flying vehicles weaving through holographic advertisements"
     
@@ -27,14 +31,13 @@ def main():
     print(f"Generating image for prompt: '{prompt}'")
     start_time = time.time()
     
-    # 注意：在MPS上，需要为生成器明确指定CPU设备
     generator = torch.Generator(device="cpu").manual_seed(42)
 
     result = pipe(
         prompt=prompt,
         height=1024,
         width=1024,
-        num_inference_steps=4,  # Z-Image Turbo 只需要很少的步数
+        num_inference_steps=4,
         guidance_scale=0.0,
         generator=generator,
     )

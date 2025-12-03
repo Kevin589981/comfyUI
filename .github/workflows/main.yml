@@ -1,0 +1,63 @@
+name: ComfyUI Image Generation (Z-Image)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: macos-latest
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 3. Install ComfyUI and dependencies
+        run: |
+          git clone https://github.com/comfyanonymous/ComfyUI.git
+          cd ComfyUI
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install websocket-client
+
+      - name: 4. Download Z-Image Models
+        run: |
+          echo "创建模型目录..."
+          mkdir -p ComfyUI/models/text_encoders
+          mkdir -p ComfyUI/models/diffusion_models
+          mkdir -p ComfyUI/models/vae
+
+          echo "正在下载 Text Encoder..."
+          curl -L "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors" -o "ComfyUI/models/text_encoders/qwen_3_4b.safetensors"
+
+          echo "正在下载 Diffusion Model..."
+          curl -L "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors" -o "ComfyUI/models/diffusion_models/z_image_turbo_bf16.safetensors"
+
+          echo "正在下载 VAE..."
+          curl -L "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors" -o "ComfyUI/models/vae/ae.safetensors"
+          
+          echo "所有模型下载完成。"
+
+      - name: 5. Start ComfyUI Server in background
+        run: |
+          cd ComfyUI
+          python main.py &
+          echo "等待服务器启动..."
+          sleep 15
+          echo "服务器应该已经准备就绪。"
+
+      - name: 6. Run generation script
+        run: |
+          python run_workflow.py
+          echo "生成脚本执行完毕，检查输出..."
+          ls -R ComfyUI/output
+
+      - name: 7. Upload generated images
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-images-z-turbo
+          path: ComfyUI/output/

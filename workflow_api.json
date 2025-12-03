@@ -1,0 +1,128 @@
+{
+  "prompt": {
+    "1": {
+      "inputs": {
+        "text": "masterpiece, best quality, a futuristic cybernetic city skyline at dusk, neon lights reflecting on wet streets, flying vehicles weaving through holographic advertisements",
+        "t5": [
+          "11",
+          0
+        ]
+      },
+      "class_type": "T5TextEncode",
+      "_meta": {
+        "title": "Positive Prompt"
+      }
+    },
+    "2": {
+      "inputs": {
+        "text": "worst quality, low quality, blurry, watermark, text, signature",
+        "t5": [
+          "11",
+          0
+        ]
+      },
+      "class_type": "T5TextEncode",
+      "_meta": {
+        "title": "Negative Prompt"
+      }
+    },
+    "3": {
+      "inputs": {
+        "seed": 48293849234,
+        "steps": 4,
+        "cfg": 1,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "sgm_uniform",
+        "denoise": 1,
+        "model": [
+          "10",
+          0
+        ],
+        "positive": [
+          "1",
+          0
+        ],
+        "negative": [
+          "2",
+          0
+        ],
+        "latent_image": [
+          "5",
+          0
+        ]
+      },
+      "class_type": "KSampler",
+      "_meta": {
+        "title": "KSampler"
+      }
+    },
+    "5": {
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage",
+      "_meta": {
+        "title": "Empty Latent Image"
+      }
+    },
+    "8": {
+      "inputs": {
+        "samples": [
+          "3",
+          0
+        ],
+        "vae": [
+          "9",
+          0
+        ]
+      },
+      "class_type": "VAEDecode",
+      "_meta": {
+        "title": "VAE Decode"
+      }
+    },
+    "9": {
+      "inputs": {
+        "vae_name": "ae.safetensors"
+      },
+      "class_type": "VAELoader",
+      "_meta": {
+        "title": "Load VAE"
+      }
+    },
+    "10": {
+      "inputs": {
+        "model_name": "z_image_turbo_bf16.safetensors"
+      },
+      "class_type": "FluxDiffusionModelLoader",
+      "_meta": {
+        "title": "Load Diffusion Model"
+      }
+    },
+    "11": {
+      "inputs": {
+        "model_name": "qwen_3_4b.safetensors"
+      },
+      "class_type": "T5Loader",
+      "_meta": {
+        "title": "Load Text Encoder (T5)"
+      }
+    },
+    "12": {
+      "inputs": {
+        "filename_prefix": "Z-Image-Turbo",
+        "images": [
+          "8",
+          0
+        ]
+      },
+      "class_type": "SaveImage",
+      "_meta": {
+        "title": "Save Image"
+      }
+    }
+  },
+  "client_id": "YOUR_CLIENT_ID_HERE"
+}
